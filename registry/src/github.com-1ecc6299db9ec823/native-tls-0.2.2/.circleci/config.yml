@@ -1,0 +1,51 @@
+restore_registry: &RESTORE_REGISTRY
+  restore_cache:
+    key: registry
+save_registry: &SAVE_REGISTRY
+  save_cache:
+    key: registry-{{ .BuildNum }}
+    paths:
+    - /usr/local/cargo/registry/index
+deps_key: &DEPS_KEY
+  key: deps-{{ checksum "~/rust-version" }}-{{ checksum "~/openssl-version" }}-{{ checksum "Cargo.lock" }}
+restore_deps: &RESTORE_DEPS
+  restore_cache:
+    <<: *DEPS_KEY
+save_deps: &SAVE_DEPS
+  save_cache:
+    <<: *DEPS_KEY
+    paths:
+    - target
+    - /usr/local/cargo/registry/cache
+job: &JOB
+  environment:
+    RUSTFLAGS: -D warnings
+  steps:
+    - checkout
+    - *RESTORE_REGISTRY
+    - run: cargo generate-lockfile
+    - *SAVE_REGISTRY
+    - run: rustc --version > ~/rust-version
+    - run: openssl version > ~/openssl-version
+    - *RESTORE_DEPS
+    - run: cargo test
+    - run: rustdoc --test README.md -L target/debug/deps -L target/debug
+    - *SAVE_DEPS
+
+version: 2
+jobs:
+  openssl-1.1.0:
+    <<: *JOB
+    docker:
+      - image: rust:1.21.0-stretch
+  openssl-1.0.2:
+    <<: *JOB
+    docker:
+      - image: rust:1.21.0-jessie
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - openssl-1.1.0
+      - openssl-1.0.2
