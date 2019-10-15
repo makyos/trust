@@ -38,12 +38,12 @@ impl Cfg {
 
 fn paint(s: &String) -> colored::ColoredString {
     match rand::thread_rng().gen_range(1, 7) {
-        1 => return s.red().reversed(),
-        2 => return s.green().reversed(),
-        3 => return s.yellow().reversed(),
-        4 => return s.blue().reversed(),
-        5 => return s.magenta().reversed(),
-        _ => return s.cyan().reversed(),
+        1 => return s.color("white").on_color("red"),
+        2 => return s.color("white").on_color("green"),
+        3 => return s.color("white").on_color("yellow"),
+        4 => return s.color("white").on_color("blue"),
+        5 => return s.color("white").on_color("magenta"),
+        _ => return s.color("white").on_color("cyan"),
     }
 }
 
