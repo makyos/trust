@@ -36,8 +36,19 @@ impl Cfg {
     }
 }
 
+static mut LAST_COLOR: i32 = 0;
+
 fn paint(s: &String) -> colored::ColoredString {
-    match rand::thread_rng().gen_range(1, 7) {
+
+    let mut color: i32 = rand::thread_rng().gen_range(1, 7);;
+    unsafe {
+        while color == LAST_COLOR {
+            color = rand::thread_rng().gen_range(1, 7);
+        }
+        LAST_COLOR = color;
+    }
+
+    match color {
         1 => return s.color("white").on_color("red"),
         2 => return s.color("white").on_color("green"),
         3 => return s.color("white").on_color("yellow"),
@@ -46,6 +57,7 @@ fn paint(s: &String) -> colored::ColoredString {
         _ => return s.color("white").on_color("cyan"),
     }
 }
+
 
 fn main() {
 
@@ -58,8 +70,8 @@ fn main() {
         "5735002-1yk7kztSaYgK5Ohcz0zxgy54jpo82lJWI1H35tmI3R",
         "BGIgwvSyKmOEdt9W5ZAHXp7IHLA6cfspyf1l2B54A8U");
 
-    let _re1 = Regex::new(r"#.*|http.*").unwrap();
-    let _re2 = Regex::new(r" *").unwrap();
+    let re1 = Regex::new(r"#.*|http.*").unwrap();
+    let re2 = Regex::new(r"  +").unwrap();
 
     let future = TwitterStreamBuilder::filter(token)
         .track(Some(cfg.track_word.as_str()))
@@ -70,7 +82,11 @@ fn main() {
             match serde_json::from_str(&json) {
                 Ok(j) => {
                     let tweet: Tweet = j;
-                    let text = &tweet.text.replace("\n", " ");
+                    let mut text:String = String::from(&tweet.text);
+                    text = text.trim().replace("\n", " ");
+                    text = text.trim().replace("\r", " ");
+                    text = String::from(re1.replace_all(text.trim(), ""));
+                    text = String::from(re2.replace_all(text.trim(), " "));
                     //print!("----- {} ", re1.replace_all(&text, "").trim());
                     print!("{}", paint(&format!(" {} ", &text)));
                     stdout().flush().unwrap();
