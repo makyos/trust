@@ -40,7 +40,7 @@ static mut LAST_COLOR: i32 = 0;
 
 fn paint(s: &String) -> colored::ColoredString {
 
-    let mut color: i32 = rand::thread_rng().gen_range(1, 7);;
+    let mut color: i32 = rand::thread_rng().gen_range(1, 7);
     unsafe {
         while color == LAST_COLOR {
             color = rand::thread_rng().gen_range(1, 7);
