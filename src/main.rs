@@ -38,7 +38,7 @@ impl Cfg {
 
 static mut LAST_COLOR: i32 = 0;
 
-fn paint(s: &String) -> colored::ColoredString {
+fn paint(s: &str) -> colored::ColoredString {
 
     let mut color: i32 = rand::thread_rng().gen_range(1, 7);
     unsafe {
@@ -49,12 +49,12 @@ fn paint(s: &String) -> colored::ColoredString {
     }
 
     match color {
-        1 => return s.color("white").on_color("red"),
-        2 => return s.color("white").on_color("green"),
-        3 => return s.color("white").on_color("yellow"),
-        4 => return s.color("white").on_color("blue"),
-        5 => return s.color("white").on_color("magenta"),
-        _ => return s.color("white").on_color("cyan"),
+        1 => s.color("white").on_color("red"),
+        2 => s.color("white").on_color("green"),
+        3 => s.color("white").on_color("yellow"),
+        4 => s.color("white").on_color("blue"),
+        5 => s.color("white").on_color("magenta"),
+        _ => s.color("white").on_color("cyan"),
     }
 }
 
